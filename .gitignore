@@ -34,4 +34,5 @@ configs/dram/lowp_sweep.cfg
 Frequency_out
 queens
 queens_gcc
+queens_mips
 *.log

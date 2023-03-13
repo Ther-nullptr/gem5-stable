@@ -2,6 +2,12 @@
 
 ## 1 gem5的安装和测试
 
+编译指定架构的处理器：
+
+```bash
+$ scons build/ARM/gem5.debug -j 4
+```
+
 编译`build/ARM/gem5.debug`后，使用如下指令进行测试：
 
 ```bash
@@ -72,7 +78,37 @@ $ build/ARM/gem5.debug configs/example/se.py -c labs/lab1/queens --cpu-type=Mino
 
 ### 2.4 (选做)自行搭建交叉编译器
 
+编译指定架构的处理器：
 
+```bash
+$ scons build/MIPS/gem5.debug -j 4
+```
+
+安装ARM指令集交叉编译器`mips-linux-gnu-gcc`：
+
+```bash
+$ sudo apt-get install emdebian-archive-keyring
+$ sudo apt-get install linux-libc-dev-mips-cross libc6-mips-cross libc6-dev-mips-cross binutils-mips-linux-gnu gcc-mips-linux-gnu g++-mips-linux-gnu
+```
+
+对八皇后程序`queens.c`进行交叉编译：
+
+```bash
+$ mipsel-linux-gnu-gcc -o labs/lab1/queens_mips labs/lab1/queens.c --static
+```
+
+> 注意这里必须使用`mipsel-linux-gnu-gcc`而不是`mips-linux-gnu-gcc`，这是由于如果用后者会出现以下错误：
+> ![image-20230313160803870.png](https://s2.loli.net/2023/03/13/crZ8buVi9E2x5qn.png)
+
+根据所提供的参数，在MIPS架构上对可执行程序进行仿真：
+
+```bash
+$ build/MIPS/gem5.debug configs/example/se.py -c labs/lab1/queens_mips --cpu-type=TimingSimpleCPU --caches --l2cache --l1d_size=8kB --l1i_size=8kB --l1d_assoc=4 --l1i_assoc=4 --l2_size=1MB --l2_assoc=8 --cacheline_size=64  --cpu-clock=1GHz --num-cpus=1 
+```
+
+![image-20230313160803870.png](https://s2.loli.net/2023/03/13/crZ8buVi9E2x5qn.png)
+
+这里并没有运行成功，可能是由于gem5对于MIPS架构的支持不够全面。
 
 ## 3 流水线处理器的性能分析
 
@@ -239,3 +275,4 @@ class MinorDefaultFloatSimdFU(MinorFU):
 [^4]: https://www.gem5.org/documentation/general_docs/cpu_models/minor_cpu
 [^5]: http://old.gem5.org/Visualization.html
 [^6]: https://blog.csdn.net/leionway/article/details/90479487
+[^7]: https://blog.csdn.net/wfxzf/article/details/88974144
