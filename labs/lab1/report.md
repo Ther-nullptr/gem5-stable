@@ -199,7 +199,7 @@ class MinorDefaultIntDivFU(MinorFU):
     opClasses = minorMakeOpClassSet(['IntDiv'])
     issueLat = 9
 -    opLat = 9
-+    opLat = 1
++    opLat = 4
 ```
 
 **version 2**：仅修改浮点算子
@@ -221,15 +221,15 @@ class MinorDefaultFloatSimdFU(MinorFU):
 
     timings = [MinorFUTiming(description='FloatSimd',
         srcRegsRelativeLats=[2])]
--    opLat = 1
-+    opLat = 6
+-    opLat = 6
++    opLat = 3
 ```
 
 优化后的结果如下：
 
 ![image-20230312174244718](https://s2.loli.net/2023/03/12/A84mkpKy9oesWQH.png)
 
-可以看出，只有修改整数运算单元时，才能提升计算速度。
+可以看出，只有修改整数运算单元时，才能提升计算速度。这与之前的推测相一致。
 
 ## 参考文献
 
