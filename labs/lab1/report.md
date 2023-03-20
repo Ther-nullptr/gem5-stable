@@ -97,7 +97,7 @@ $ sudo apt-get install linux-libc-dev-mips-cross libc6-mips-cross libc6-dev-mips
 $ mipsel-linux-gnu-gcc -o labs/lab1/queens_mips labs/lab1/queens.c --static
 ```
 
-> 注意这里必须使用`mipsel-linux-gnu-gcc`而不是`mips-linux-gnu-gcc`，这是由于如果用后者会出现以下错误：
+> 注意这里必须使用`mipsel-linux-gnu-gcc`而不是`mips-linux-gnu-gcc`，这是由于如果用后者会出现以下错误（gem5仅支持小端法的MIPS）：
 > ![image-20230313160803870.png](https://s2.loli.net/2023/03/13/crZ8buVi9E2x5qn.png)
 
 根据所提供的参数，在MIPS架构上对可执行程序进行仿真：
@@ -108,7 +108,7 @@ $ build/MIPS/gem5.debug configs/example/se.py -c labs/lab1/queens_mips --cpu-typ
 
 ![image-20230313160803870.png](https://s2.loli.net/2023/03/13/crZ8buVi9E2x5qn.png)
 
-这里并没有运行成功，可能是由于gem5对于MIPS架构的支持不够全面。
+这里并没有运行成功，是由于gem5对于MIPS架构的支持不够全面，并不支持prefench这一操作。
 
 ## 3 流水线处理器的性能分析
 
@@ -146,14 +146,15 @@ $ python2 ./util/minorview.py ./m5out/trace.out
 Execute stage包括以下模块：
 
 * scoreboard: 控制指令的发布。它包含一个flight instructions的数量，这些指令将写入每个通用CPU的整数或浮点寄存器。只有当记分牌上的指令数为0时，指令才会被发出，这些指令将写入一个指令源寄存器。一旦指令被发出，指令的每个目标寄存器的记分牌计数将被递增。
-* inFlightInsts: 存储in flight instructions，并遵循正确的执行顺序。
-* inputBuffer: 作为指令的缓冲区。
-* Commit: 提交将要被执行的指令。
+* inFlightInsts: 作为存储in flight instructions的队列，并遵循正确的执行顺序，先进先出。
+* inputBuffer: 作为指令的缓冲区，等待提交执行。
+* Int,Mul,Div...: 这些模块可能类似于经典MIPS五级流水线中的ALU，执行整型（Intx2、Mul、Div），浮点型（Float）运算，还包括一个Misc单元（Minimal instruction set computer）和一个Mem单元。
+* Commit: 提交`inFlightInsts`中的指令。
 
 #### c)
 
-* forward FIFO: 显示了当前tick时被推入的数据（在左边），传输中的数据，以及其输出的可用数据（在右边）。
-* backward FIFO: （Fetch2和Fetch1之间的）显示分支预测数据。
+* forward FIFO: 寄存上一级的数据，显示了当前tick时被推入的数据（在左边），传输中的数据，以及其输出的可用数据（在右边）。
+* backward FIFO: （Fetch2和Fetch1之间）显示分支预测的信息，Fench2预测的信息回传给Fench1中的指令在遇到分支时发挥决策。
 
 ### 3.2 处理器频率——性能特性
 
@@ -198,19 +199,17 @@ $ ./sim_freq.sh | tee minor.log
 
 #### (a)
 
-可以看出，随着频率增长，处理器运行时间变短，且变化速率越来越慢（呈非线性关系）。从1GHz->3GHz，timing CPU提升了约2.08倍，minor CPU提升了约1.86倍。原因如下：
+可以看出，随着频率增长，处理器运行时间变短，且变化速率越来越慢（呈非线性关系）。从1GHz->3GHz，timing CPU提升了约2.08倍，minor CPU提升了约1.86倍。推测原因如下：
 
-1. 指令执行速度不仅受CPU主频的影响，还受其他因素的影响，例如CPU的架构、缓存大小、指令集等。
-2. 当CPU的主频达到一定水平后，增加主频对指令执行速度的提升效果会逐渐减弱——在高主频下，CPU的内部结构会遇到更多的物理限制。
-3. 在流水线中，当CPU处理一条指令时，需要经过多个时钟周期的处理过程才能完成——即使CPU主频提高了，指令执行速度也不会立刻提高到相应的水平。
+CPU的时钟周期中，90%的时间都在访存。CPU的访存瓶颈来源于CPU时钟速度与内存时钟速度无法匹配，换句话说，内存延迟是造成CPU访存瓶颈的罪魁祸首。提升CPU频率之后，由于cache、memory的访存速度没有明显提升，无法与CPU匹配，导致速度被拖慢（设想以下场景：CPU只是频率变高，但执行代码的逻辑并没有发生变化，对于cache、memory的访问逻辑也没有发生改变。这个时候，假如发生了cache未被命中的情况，从memory中提取数据的时间仍然没有缩短，且占据了大量时间，大大抵消了增加主频带来的好处）。
 
 #### (b)
 
-timing CPU上升更多。这是因为minor CPU是4周期流水线CPU，而timing CPU在每个周期中计算一个指令，只在访存阶段需要等待多个周期读取内存，并行化程度更低，提升主频时提速更显著。
-
+timing CPU上升更多。这是因为minor CPU是4周期流水线CPU，而timing CPU在每个周期中计算一个指令，只在访存阶段需要等待多个周期读取内存——也就是说，timing CPU在缓存访问时停滞不前，等待内存系统的响应，然后再继续进行。这个时候内存时钟对速度的影响没有那么明显，CPU时钟也成为影响访存速度的一个重要因素。
 ### 3.3 处理器频率——性能特性
 
-应该修改整数运算单元，因为解决八皇后问题中涉及到的计算均为整数计算。
+观察八皇后问题的源程序，发现解决八皇后问题中涉及到的计算均为整数计算，所以推测应该修改整数运算单元。`stats.txt`的统计信息也证实了这一点：
+![image.png](https://s2.loli.net/2023/03/20/smqoMgIzL5A8xRZ.png)
 
 对以下参数进行修改：
 
@@ -276,3 +275,4 @@ class MinorDefaultFloatSimdFU(MinorFU):
 [^5]: http://old.gem5.org/Visualization.html
 [^6]: https://blog.csdn.net/leionway/article/details/90479487
 [^7]: https://blog.csdn.net/wfxzf/article/details/88974144
+[^8]: https://cirosantilli.com/linux-kernel-module-cheat/#gem5-cpu-types
