@@ -1,5 +1,7 @@
 # LAB 1
 
+本次作业的参考文献有：[^1][^2][^3][^4][^5][^6][^7][^8]
+
 ## 1 gem5的安装和测试
 
 编译指定架构的处理器：
@@ -269,10 +271,17 @@ class MinorDefaultFloatSimdFU(MinorFU):
 ## 参考文献
 
 [^1]: https://www.gem5.org/documentation/learning_gem5/part1/example_configs/
+
 [^2]: https://www.gem5.org/documentation/general_docs/cpu_models/minor_cpu
+
 [^3]: https://askubuntu.com/questions/1059570/unmet-dependencies-that-i-actually-have
+
 [^4]: https://www.gem5.org/documentation/general_docs/cpu_models/minor_cpu
+
 [^5]: http://old.gem5.org/Visualization.html
+
 [^6]: https://blog.csdn.net/leionway/article/details/90479487
+
 [^7]: https://blog.csdn.net/wfxzf/article/details/88974144
+
 [^8]: https://cirosantilli.com/linux-kernel-module-cheat/#gem5-cpu-types
