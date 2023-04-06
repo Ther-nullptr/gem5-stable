@@ -139,7 +139,7 @@ void readMemoryByte(int cache_hit_threshold, size_t malicious_x, uint8_t value[2
 
     for (i = 0; i < 256; i++)
         results[i] = 0;
-    for (tries = 999; tries > 0; tries--)
+    for (tries = 49; tries > 0; tries--)
     {
 
 #ifndef NOCLFLUSH

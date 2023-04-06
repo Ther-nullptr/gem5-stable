@@ -69,7 +69,6 @@ if ((int)time2 <= cache_hit_threshold && mix_i != array1[tries % array1_size])
 }
 ```
 
-> 这里访问的顺序有讲究：`mix_i = ((i * 167) + 13) & 255;`，见代码：https://godbolt.org/z/6axfK6j9c，为了防止所谓的“stride prediction”。
->
+> 这里访问的顺序有讲究：`mix_i = ((i * 167) + 13) & 255;`，见代码：[code example](https://godbolt.org/z/6axfK6j9c)，为了防止所谓的“stride prediction”。
 
 
