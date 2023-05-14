@@ -35,4 +35,6 @@ Frequency_out
 queens
 queens_gcc
 queens_mips
+daxpy-gem5
+daxpy-gem5-original
 *.log
