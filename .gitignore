@@ -38,3 +38,5 @@ queens_mips
 daxpy-gem5
 daxpy-gem5-original
 *.log
+./labs/lab2/daxpy-gem5.s
+./labs/lab2/daxpy-gem5-original.s
