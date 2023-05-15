@@ -59,7 +59,7 @@ system = System()
 
 # Set the clock frequency of the system (and all of its children)
 system.clk_domain = SrcClockDomain()
-system.clk_domain.clock = '2GHz'
+system.clk_domain.clock = '3GHz'
 system.clk_domain.voltage_domain = VoltageDomain()
 
 # Set up the system
