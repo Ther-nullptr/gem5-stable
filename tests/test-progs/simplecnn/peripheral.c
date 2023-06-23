@@ -12,9 +12,9 @@ void periLogout(int peri_id)
 	munmap(PERI_ADDR[peri_id], sizeof(uint8_t));
 }
 
-void periInit(volatile uint8_t *cmd_reg, unsigned char counter)
+void periInit(volatile uint8_t *cmd_reg, unsigned char counter, size_t counter_offset)
 {
-	*(cmd_reg + 1) = counter;
+	*(cmd_reg + counter_offset) = counter;
 	*cmd_reg = VDEV_INIT;
 	while (!(*cmd_reg & VDEV_READY))
 		;

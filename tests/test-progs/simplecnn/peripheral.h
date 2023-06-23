@@ -16,7 +16,7 @@
 #define RF_ID 2
 
 #define VDEV_INIT 0x01
-#define VDEV_EXEC 0x01
+#define VDEV_EXEC 0x02
 #define VDEV_READY 0x04
 #define VDEV_FINISH 0x08
 
@@ -42,7 +42,7 @@ static void *PERI_ADDR[8] = {
 
 void periRegister(int peri_id, uint8_t *reg_file);
 void periLogout(int peri_id);
-void periInit(volatile uint8_t *cmd_reg, unsigned char counter);
+void periInit(volatile uint8_t *cmd_reg, unsigned char counter, size_t counter_offset);
 void periWrite(volatile uint8_t *cmd_reg, size_t offset, void *src, size_t len);
 void periRead(volatile uint8_t *cmd_reg, size_t offset, void *dest, size_t len);
 bool periIsFinished(volatile uint8_t *cmd_reg);

@@ -26,6 +26,7 @@
 void crop_img(uint8_t in[50][50], uint8_t out[28][28])
 {
 	// first, find the center of the input image
+    // m5_reset_stats(0, 0);
 	double weighted_x_sum = 0;
 	double weighted_y_sum = 0;
 	double weight_sum = 0;
@@ -53,6 +54,7 @@ void crop_img(uint8_t in[50][50], uint8_t out[28][28])
 			out[x][y] = in[x + x_offset][y + y_offset];
 		}
 	}
+    // m5_dump_stats(0, 0);
 }
 
 
@@ -67,7 +69,7 @@ int main()
 	volatile uint8_t *data = (uint8_t *)mmap(PERI_ADDR[0], 10 * 1024 * 1024, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 	printf("Peripherals Registered.\n");
 
-	periInit(data, 0);
+	periInit(data, 0, 1);
 	printf("Inited.\n");
 
 	FILE *fmodel = NULL;
@@ -165,7 +167,7 @@ int main()
 		periWrite(data, 2 + 1024 * 1024, img, sizeof(img));
 		for (int j = 1; j <= 10; j++)
 		{
-			periInit(data, j);
+			periInit(data, j, 1);
 		}
 		assert(periIsFinished(data));
 		periRead(data, 2, finalresult + count, sizeof(unsigned char));
