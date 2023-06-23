@@ -25,7 +25,7 @@ public:
 		mem2 = core.memhub.getMemory("activation_mem2").getPtr();
 		mem3 = core.memhub.getMemory("weight_and_bias_mem").getPtr();
 	}
+
 private:
-	
 	Core core;
 };
