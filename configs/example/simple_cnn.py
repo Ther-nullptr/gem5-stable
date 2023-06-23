@@ -11,9 +11,9 @@ system.mem_mode = 'atomic'
 system.mem_ranges = [AddrRange('512MB')]
 
 #vdev
-system.has_vdev = 1	
-system.vdev_ranges = [AddrRange('512MB', '522MB')]
-system.vaddr_vdev_ranges = [AddrRange('1000MB', '1010MB')]
+system.has_vdev = 1
+system.vdev_ranges = [AddrRange('512MB', '522MB'), AddrRange('522MB', '523MB')]
+system.vaddr_vdev_ranges = [AddrRange('1000MB', '1010MB'), AddrRange('1010MB', '1011MB')]
 ###
 
 #energy mgmt
@@ -48,8 +48,18 @@ system.vdev1.port = system.membus.master
 system.vdev1.s_energy_port = system.energy_mgmt.m_energy_port
 system.vdev1.data_bandwidth = 10000  #bandwidth, ticks per byte # 10000 = 100MB/s
 
+system.vdev2 = VirtualDeviceDSP()
+system.vdev2.cpu = system.cpu
+system.vdev2.range = system.vdev_ranges[1]
+system.vdev2.energy_consumed_per_cycle_vdev = 1
+system.vdev2.delay_cpu_interrupt = '1000t'
+system.vdev2.delay_set = '1000t'
+system.vdev2.port = system.membus.master
+system.vdev2.s_energy_port = system.energy_mgmt.m_energy_port
+system.vdev2.data_bandwidth = 10000  #bandwidth, ticks per byte # 10000 = 100MB/s
+
 process = LiveProcess()
-process.cmd = ['tests/test-progs/simplecnn/main']
+process.cmd = ['tests/test-progs/simplecnn/main_with_dsp']
 system.cpu.workload = process
 system.cpu.createThreads()
 
