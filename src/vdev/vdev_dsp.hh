@@ -2,8 +2,8 @@
 // Created by lf-z on 4/24/17.
 //
 
-#ifndef GEM5_VDEV_HH
-#define GEM5_VDEV_HH
+#ifndef GEM5_VDEV_DSP_HH
+#define GEM5_VDEV_DSP_HH
 
 #include <fstream>
 
@@ -11,11 +11,11 @@
 #include <vector>
 #include "mem/mem_object.hh"
 #include "cpu/base.hh"
-#include "params/VirtualDevice.hh"
+#include "params/VirtualDeviceDSP.hh"
 
-#include "./SimpleCNN/ai_chip.h"
+#include "./SimpleCNN/crop_image_dsp.h"
 
-class VirtualDevice : public MemObject
+class VirtualDeviceDSP : public MemObject
 {
 protected:
     /** Id of the virtual device */
@@ -26,10 +26,10 @@ private:
     class DevicePort : public SlavePort
     {
     private:
-        VirtualDevice* vdev;
+        VirtualDeviceDSP* vdev;
 
     public:
-        DevicePort(const std::string& _name, VirtualDevice* _vdev);
+        DevicePort(const std::string& _name, VirtualDeviceDSP* _vdev);
 
     protected:
         Tick recvAtomic(PacketPtr pkt);
@@ -44,13 +44,13 @@ private:
 
 public:
 
-    typedef VirtualDeviceParams Params;
+    typedef VirtualDeviceDSPParams Params;
     const Params *params() const
     {
         return reinterpret_cast<const Params *>(_params);
     }
-    VirtualDevice(const Params *p);
-    virtual ~VirtualDevice() {}
+    VirtualDeviceDSP(const Params *p);
+    virtual ~VirtualDeviceDSP() {}
     virtual void init();
 
     /** Flags for the first byte in the memory. */
@@ -88,8 +88,8 @@ public:
 
     int access_time = 0;
 protected:
-    /*AI chip unit*/
-    AIChip aichip;
+    /*DSP unit*/
+    CropImageDSP dsp;
 
     BaseCPU *cpu;
     /** Address range of the virtual device*/
@@ -105,7 +105,7 @@ protected:
     /** Execution states of vdev : [OFF, IDLE, ACTIVE]; **/
     State execution_state = STATE_POWEROFF;
 
-    EventWrapper<VirtualDevice, &VirtualDevice::triggerInterrupt> event_interrupt;
+    EventWrapper<VirtualDeviceDSP, &VirtualDeviceDSP::triggerInterrupt> event_interrupt;
 
     /** status register for the vdev.
      * |-high-----------------------low-|
@@ -115,4 +115,4 @@ protected:
     double data_bandwidth;
 };
 
-#endif //GEM5_VDEV_HH
+#endif //GEM5_VDEV_DSP_HH
