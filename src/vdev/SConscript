@@ -4,6 +4,8 @@ Source('./SimpleCNN/ai_chip.cpp')
 Source('./SimpleCNN/core.cpp')
 Source('./SimpleCNN/memhub.cpp')
 Source('./SimpleCNN/memory.cpp')
+Source('./SimpleCNN/crop_image_dsp.cpp')
+Source('./SimpleCNN/dsp_core.cpp')
 Source('vdev.cc')
 SimObject('VirtualDevice.py')
 

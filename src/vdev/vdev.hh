@@ -14,6 +14,7 @@
 #include "params/VirtualDevice.hh"
 
 #include "./SimpleCNN/ai_chip.h"
+#include "./SimpleCNN/crop_image_dsp.h"
 
 class VirtualDevice : public MemObject
 {
@@ -90,6 +91,9 @@ public:
 protected:
     /*AI chip unit*/
     AIChip aichip;
+
+    /*DSP unit*/
+    CropImageDSP dsp;
 
     BaseCPU *cpu;
     /** Address range of the virtual device*/

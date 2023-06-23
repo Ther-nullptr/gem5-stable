@@ -66,6 +66,7 @@ VirtualDevice::VirtualDevice(const Params *p)
     trace.resize(0);
     
     aichip.tickPerCycle = clockPeriod();
+    dsp.tickPerCycle = clockPeriod();
 }
 
 void
@@ -95,7 +96,7 @@ VirtualDevice::triggerInterrupt()
    pmem |= VDEV_READY;
    pmem &= ~VDEV_WORK;
 
-   if (aichip.finished)
+   if (aichip.finished || dsp.finished)
    {
       pmem |= VDEV_FINISH;
    }
@@ -118,6 +119,10 @@ Tick VirtualDevice::access(PacketPtr pkt)
         {
             *(pkt->getPtr<uint8_t>()) = aichip.counter;
         }
+        else if (offset == 1024 * 1024 * 9)
+        {
+            *(pkt->getPtr<uint8_t>()) = dsp.counter;
+        }
         else
         {
             //normal read
@@ -128,11 +133,19 @@ Tick VirtualDevice::access(PacketPtr pkt)
             else if (offset < 1024 * 1024 * 2 + 2)
             {
                 memcpy(pkt->getPtr<uint8_t>(), (uint8_t *)aichip.mem2 + offset - 1024 * 1024 - 2, pkt->getSize());
-            } else
+            } 
+            else if (offset < 1024 * 1024 * 9 + 1)
             {
                 memcpy(pkt->getPtr<uint8_t>(), (uint8_t *)aichip.mem3 + offset - 1024 * 1024 * 2 - 2, pkt->getSize());
             }
-            
+            else if (offset < 1024 * 1024 * 9 + 1024 * 512 + 1)
+            {
+                memcpy(pkt->getPtr<uint8_t>(), (uint8_t *)dsp.mem1 + offset - 1024 * 1024 * 9 - 1, pkt->getSize());
+            }
+            else
+            {
+                memcpy(pkt->getPtr<uint8_t>(), (uint8_t *)dsp.mem2 + offset - 1024 * 1024 * 9 - 1024 * 512 - 1, pkt->getSize());
+            }
         }
         cpu->virtualDeviceSet(data_bandwidth * pkt->getSize());
     }
@@ -162,7 +175,8 @@ Tick VirtualDevice::access(PacketPtr pkt)
                     pmem &= ~VDEV_FINISH;
 
                     /* Schedule interrupt. */
-                    delay_self = aichip.run();
+                    delay_self = dsp.run();
+                    delay_self += aichip.run();
                     DPRINTF(VirtualDevice, "Need Ticks:%i, Cycles:%i.\n",
                             delay_self,
                             ticksToCycles(delay_self));
@@ -180,6 +194,10 @@ Tick VirtualDevice::access(PacketPtr pkt)
         {
             aichip.counter = *(pkt->getConstPtr<uint8_t>());
         }
+        else if (offset == 1024 * 1024 * 9)
+        {
+            dsp.counter = *(pkt->getConstPtr<uint8_t>());
+        }
         else
         {
             /* Normal write. */
@@ -191,9 +209,17 @@ Tick VirtualDevice::access(PacketPtr pkt)
             {
                 memcpy((uint8_t *)aichip.mem2 + offset - 1024 * 1024 - 2, pkt_addr, pkt->getSize());
             }
-            else
+            else if (offset < 1024 * 1024 * 9 + 1)
             {
                 memcpy((uint8_t *)aichip.mem3 + offset - 1024 * 1024 * 2 - 2, pkt_addr, pkt->getSize());
+            }
+            else if (offset < 1024 * 1024 * 9 + 1024 * 512 + 1)
+            {
+                memcpy((uint8_t *)dsp.mem1 + offset - 1024 * 1024 * 9 - 1, pkt_addr, pkt->getSize());
+            }
+            else
+            {
+                memcpy((uint8_t *)dsp.mem2 + offset - 1024 * 1024 * 9 - 1024 * 512 - 1, pkt_addr, pkt->getSize());
             }
             cpu->virtualDeviceSet(data_bandwidth * pkt->getSize());
         }
