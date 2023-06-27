@@ -41,4 +41,5 @@ daxpy-gem5-original
 /labs/lab2/daxpy-gem5.s
 /labs/lab2/daxpy-gem5-original.s
 .vscode/
+*.o
 main
