@@ -11,9 +11,9 @@ system.mem_mode = 'atomic'
 system.mem_ranges = [AddrRange('512MB')]
 
 #vdev
-system.has_vdev = 1
-system.vdev_ranges = [AddrRange('512MB', '522MB'), AddrRange('522MB', '523MB')]
-system.vaddr_vdev_ranges = [AddrRange('1000MB', '1010MB'), AddrRange('1010MB', '1011MB')]
+system.has_vdev = 2
+system.vdev_ranges = [AddrRange('512MB', '522MB'), AddrRange('523MB', '524MB')]
+system.vaddr_vdev_ranges = [AddrRange('1000MB', '1010MB'), AddrRange('1011MB', '1012MB')]
 ###
 
 #energy mgmt

@@ -30,7 +30,7 @@ static int VDEV_REG_NUM[8] = {
 	3,
 	3};
 
-static void *PERI_ADDR[11] = {
+static void *PERI_ADDR[12] = {
 	(void *)0x3e800000,
 	(void *)0x3e900000,
 	(void *)0x3ea00000,
@@ -41,7 +41,8 @@ static void *PERI_ADDR[11] = {
 	(void *)0x3ef00000,
     (void *)0x3f000000,
     (void *)0x3f100000,
-    (void *)0x3f200000};
+    (void *)0x3f200000,
+    (void *)0x3f300000};
 
 void periRegister(int peri_id, uint8_t *reg_file);
 void periLogout(int peri_id);

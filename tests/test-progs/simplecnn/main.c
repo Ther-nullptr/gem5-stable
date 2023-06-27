@@ -26,42 +26,42 @@
 void crop_img(uint8_t in[50][50], uint8_t out[28][28])
 {
 	// first, find the center of the input image
-    // m5_reset_stats(0, 0);
-	double weighted_x_sum = 0;
-	double weighted_y_sum = 0;
-	double weight_sum = 0;
-	for (int x = 0; x < 50; x++)
-	{
-		for (int y = 0; y < 50; y++)
-		{
-			weighted_x_sum += x * in[x][y];
-			weighted_y_sum += y * in[x][y];
-			weight_sum += in[x][y];
-		}
-	}
-	double x_center = weighted_x_sum / weight_sum;
-	double y_center = weighted_y_sum / weight_sum;
+    m5_reset_stats(0, 0);
+    double weighted_x_sum = 0;
+    double weighted_y_sum = 0;
+    double weight_sum = 0;
+    for (int x = 0; x < 50; x++)
+    {
+        for (int y = 0; y < 50; y++)
+        {
+            weighted_x_sum += x * in[x][y];
+            weighted_y_sum += y * in[x][y];
+            weight_sum += in[x][y];
+        }
+    }
+    double x_center = weighted_x_sum / weight_sum;
+    double y_center = weighted_y_sum / weight_sum;
 
-	// calculate the offset to move the center to (13.5, 13.5)
-	int x_offset = lround(x_center - 13.5);
-	int y_offset = lround(y_center - 13.5);
+    // calculate the offset to move the center to (13.5, 13.5)
+    int x_offset = lround(x_center - 13.5);
+    int y_offset = lround(y_center - 13.5);
 
-	// crop the image
-	for (int x = 0; x < 28; x++)
-	{
-		for (int y = 0; y < 28; y++)
-		{
-			out[x][y] = in[x + x_offset][y + y_offset];
-		}
-	}
-    // m5_dump_stats(0, 0);
+    // crop the image
+    for (int x = 0; x < 28; x++)
+    {
+        for (int y = 0; y < 28; y++)
+        {
+            out[x][y] = in[x + x_offset][y + y_offset];
+        }
+    }
+    m5_dump_stats(0, 0);
 }
 
 
 int main()
 {
 	/*****************************/
-	m5_dumpreset_stats(0, 0);
+	// m5_dumpreset_stats(0, 0);
 	/*****************************/
 
 	printf("Program Start.\n");
@@ -149,7 +149,7 @@ int main()
 	}
 
 	/*****************************/
-	m5_dumpreset_stats(0, 0);
+	// m5_dumpreset_stats(0, 0);
 	/*****************************/
 
 	uint8_t input[50][50];
@@ -177,7 +177,7 @@ int main()
 	periLogout(0);
 
 	/*****************************/
-	m5_dumpreset_stats(0, 0);
+	// m5_dumpreset_stats(0, 0);
 	/*****************************/
 
 	int correct = 0;

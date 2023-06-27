@@ -27,7 +27,7 @@
 int main()
 {
 	/*****************************/
-	m5_dumpreset_stats(0, 0);
+	// m5_dumpreset_stats(0, 0);
 	/*****************************/
 
 	printf("Program Start.\n");
@@ -38,7 +38,7 @@ int main()
 	periInit(data, 0, 1); // initialize the aichip
 	printf("aichip Inited.\n");
 
-    volatile uint8_t *data_dsp = (uint8_t *)mmap(PERI_ADDR[10], 1024 * 1024, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    volatile uint8_t *data_dsp = (uint8_t *)mmap(PERI_ADDR[11], 1024 * 1024, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 	printf("Peripherals Registered.\n");
 
 	periInit(data_dsp, 0, 1); // initialize the aichip
@@ -121,7 +121,7 @@ int main()
 	}
 
 	/*****************************/
-	m5_dumpreset_stats(0, 0);
+	// m5_dumpreset_stats(0, 0);
 	/*****************************/
 
 	uint8_t input[50][50];
@@ -132,6 +132,7 @@ int main()
 		fread(input, sizeof(input), 1, fdata); //read input img
 		/************* DSP Operation Begin ***************/
 		// crop input 50x50 img into 28x28
+        m5_reset_stats(0, 0);
         periWrite(data_dsp, 2, input, sizeof(input));
         for (int j = 1; j <= 3; j++)
         {
@@ -139,6 +140,7 @@ int main()
         }
         assert(periIsFinished(data_dsp));
         periRead(data_dsp, 2 + 1024 * 512, img, sizeof(img));
+        m5_dump_stats(0, 0);
 		// crop_img(input, img);
 		/************* DSP Operation End *****************/
 
@@ -153,10 +155,10 @@ int main()
 	}
 	fclose(fdata);
 	periLogout(0);
-    periLogout(10);
+    periLogout(11);
 
 	/*****************************/
-	m5_dumpreset_stats(0, 0);
+	// m5_dumpreset_stats(0, 0);
 	/*****************************/
 
 	int correct = 0;

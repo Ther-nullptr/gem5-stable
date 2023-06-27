@@ -31,37 +31,40 @@ int DSPCore::op_output()
 
 int DSPCore::op_calculate(std::string inMemName, std::string outMemName, Range inRange, Range outRange)
 {
-    uint8_t* in = (uint8_t*)memhub.getMemory(inMemName).getPtr();
-	uint8_t* out = (uint8_t*)memhub.getMemory(outMemName).getPtr();
+    for (int i = 0; i < 5; i++)
+    {
+        uint8_t* in = (uint8_t*)memhub.getMemory(inMemName).getPtr();
+        uint8_t* out = (uint8_t*)memhub.getMemory(outMemName).getPtr();
 
-    // first, find the center of the input image
-	double weighted_x_sum = 0;
-	double weighted_y_sum = 0;
-	double weight_sum = 0;
-	for (int x = inRange.begin; x < inRange.end; x++)
-	{
-		for (int y = inRange.begin; y < inRange.end; y++)
-		{
-			weighted_x_sum += x * in[x * inRange.end + y];
-			weighted_y_sum += y * in[x * inRange.end + y];
-			weight_sum += in[x * inRange.end + y];
-		}
-	}
-	double x_center = weighted_x_sum / weight_sum;
-	double y_center = weighted_y_sum / weight_sum;
+        // first, find the center of the input image
+        double weighted_x_sum = 0;
+        double weighted_y_sum = 0;
+        double weight_sum = 0;
+        for (int x = inRange.begin; x < inRange.end; x++)
+        {
+            for (int y = inRange.begin; y < inRange.end; y++)
+            {
+                weighted_x_sum += x * in[x * inRange.end + y];
+                weighted_y_sum += y * in[x * inRange.end + y];
+                weight_sum += in[x * inRange.end + y];
+            }
+        }
+        double x_center = weighted_x_sum / weight_sum;
+        double y_center = weighted_y_sum / weight_sum;
 
-	// calculate the offset to move the center to (13.5, 13.5)
-	int x_offset = lround(x_center - 13.5);
-	int y_offset = lround(y_center - 13.5);
+        // calculate the offset to move the center to (13.5, 13.5)
+        int x_offset = lround(x_center - 13.5);
+        int y_offset = lround(y_center - 13.5);
 
-	// crop the image
-	for (int x = outRange.begin; x < outRange.end; x++)
-	{
-		for (int y = outRange.begin; y < outRange.end; y++)
-		{
-			out[x * outRange.end + y] = in[(x + x_offset) * inRange.end + y + y_offset];
-		}
-	}
+        // crop the image
+        for (int x = outRange.begin; x < outRange.end; x++)
+        {
+            for (int y = outRange.begin; y < outRange.end; y++)
+            {
+                out[x * outRange.end + y] = in[(x + x_offset) * inRange.end + y + y_offset];
+            }
+        }
+    }
 
     return 1;
 }
